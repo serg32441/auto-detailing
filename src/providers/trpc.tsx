@@ -1,34 +1,31 @@
-import { createTRPCReact } from "@trpc/react-query";
-import { httpBatchLink } from "@trpc/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import superjson from "superjson";
-import type { AppRouter } from "../../api/router";
-import type { ReactNode } from "react";
+// Stub - real tRPC removed for static deployment
+import { createContext, useContext } from "react";
 
-export const trpc = createTRPCReact<AppRouter>();
+const StubContext = createContext<any>(null);
 
-const queryClient = new QueryClient();
-const trpcClient = trpc.createClient({
-  links: [
-    httpBatchLink({
-      url: "/api/trpc",
-      transformer: superjson,
-      fetch(input, init) {
-        return globalThis.fetch(input, {
-          ...(init ?? {}),
-          credentials: "include",
-        });
-      },
-    }),
-  ],
-});
+export const trpc = {
+  service: {
+    list: { useQuery: () => ({ data: null, isLoading: false }) },
+    getById: { useQuery: () => ({ data: null, isLoading: false }) },
+    getCategories: { useQuery: () => ({ data: null, isLoading: false }) },
+  },
+  booking: {
+    list: { useQuery: () => ({ data: null, isLoading: false }) },
+    create: { useMutation: () => ({ mutate: () => {}, isPending: false }) },
+    updateStatus: { useMutation: () => ({ mutate: () => {} }) },
+    delete: { useMutation: () => ({ mutate: () => {} }) },
+  },
+  auth: {
+    me: { useQuery: () => ({ data: null, isLoading: false }) },
+    logout: { useMutation: () => ({ mutate: () => {} }) },
+  },
+  useUtils: () => ({
+    invalidate: () => Promise.resolve(),
+    service: { list: { invalidate: () => {} } },
+    booking: { list: { invalidate: () => {} } },
+  }),
+} as any;
 
-export function TRPCProvider({ children }: { children: ReactNode }) {
-  return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    </trpc.Provider>
-  );
+export function TRPCProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }
