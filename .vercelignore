@@ -1,0 +1,16 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+README.md
+info.md
+Dockerfile
+docker-compose.yml
+scripts/
+*.test.ts
+*.test.tsx
+vitest.config.ts
+.DS_Store
+Thumbs.db
+push-to-github.sh
