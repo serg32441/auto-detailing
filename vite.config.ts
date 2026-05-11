@@ -27,6 +27,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
     rollupOptions: {
+      treeshake: false,
       output: {
         assetFileNames: "app/[name][extname]",
         chunkFileNames: "app/[name].js",

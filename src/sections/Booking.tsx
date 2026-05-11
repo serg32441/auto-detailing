@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { trpc } from "@/providers/trpc";
+import { trpc } from "@/trpc-client";
 import { toast } from "sonner";
 import { Calendar, Phone, User, Car, Send, CheckCircle } from "lucide-react";
 

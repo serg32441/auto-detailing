@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router";
-import { trpc } from "@/providers/trpc";
+import { trpc } from "@/trpc-client";
 import { ArrowLeft, Clock, CheckCircle, ArrowRight, Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

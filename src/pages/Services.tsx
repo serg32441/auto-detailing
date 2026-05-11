@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { trpc } from "@/providers/trpc";
+import { trpc } from "@/trpc-client";
 import { ArrowRight, Clock, CheckCircle, Search, Filter, ChevronDown } from "lucide-react";
 import Footer from "@/sections/Footer";
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { trpc } from "@/providers/trpc";
+import { trpc } from "@/trpc-client";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import {
