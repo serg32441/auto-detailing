@@ -44,15 +44,18 @@ export function useAuth(options?: UseAuthOptions) {
     }
   }, [redirectOnUnauthenticated, isLoading, user, navigate, redirectPath]);
 
+  const isAdmin = user?.role === "admin";
+
   return useMemo(
     () => ({
       user: user ?? null,
       isAuthenticated: !!user,
+      isAdmin,
       isLoading: isLoading || logoutMutation.isPending,
       error,
       logout,
       refresh: refetch,
     }),
-    [user, isLoading, logoutMutation.isPending, error, logout, refetch],
+    [user, isAdmin, isLoading, logoutMutation.isPending, error, logout, refetch],
   );
 }
