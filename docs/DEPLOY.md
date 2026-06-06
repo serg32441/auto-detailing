@@ -3,6 +3,27 @@
 CI/CD: пуш в `main` → GitHub Actions заходит на сервер по SSH и запускает
 `deploy/deploy.sh` (pull → build → restart). Доступы хранятся в GitHub Secrets.
 
+## ⚡ Быстрый старт «одной командой»
+
+На чистом Ubuntu/Debian VPS под root:
+
+```bash
+sudo apt-get update && sudo apt-get install -y git \
+  && sudo git clone https://github.com/serg32441/auto-detailing.git /srv/app \
+  && sudo bash /srv/app/deploy/server-setup.sh
+```
+
+Скрипт поставит Node 20, Docker, nginx, MySQL, соберёт образ агента и
+остановится с просьбой заполнить `/srv/app/.env`. Заполни секреты и запусти
+ещё раз — он соберёт проект и поднимет сервисы:
+
+```bash
+sudo bash /srv/app/deploy/server-setup.sh
+```
+
+После этого останется только nginx + HTTPS и вебхук ЮKassa (шаги 4 и 6 ниже).
+Ручная пошаговая установка — дальше по документу.
+
 ## 0. Что будет крутиться на сервере
 
 | Сервис | Что делает | systemd |
