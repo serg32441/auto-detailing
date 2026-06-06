@@ -93,3 +93,68 @@ export const bookings = mysqlTable("bookings", {
 
 export type Booking = typeof bookings.$inferSelect;
 export type InsertBooking = typeof bookings.$inferInsert;
+
+// ── Hermes-as-a-Service ────────────────────────────────────────────────
+// Пул заранее созданных Telegram-ботов (через BotFather). Каждому клиенту при
+// регистрации назначается свободный бот — это даёт онбординг "в один клик".
+export const botPool = mysqlTable("bot_pool", {
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 255 }).notNull().unique(),
+  // Токен бота хранится зашифрованным (AES-256-GCM), см. api/lib/crypto.ts
+  tokenEnc: text("tokenEnc").notNull(),
+  status: mysqlEnum("status", ["free", "assigned", "disabled"])
+    .default("free")
+    .notNull(),
+  tenantId: int("tenantId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type BotPoolEntry = typeof botPool.$inferSelect;
+export type InsertBotPoolEntry = typeof botPool.$inferInsert;
+
+// Клиент сервиса. Один tenant = один изолированный Docker-контейнер Hermes.
+export const tenants = mysqlTable("tenants", {
+  id: serial("id").primaryKey(),
+  // Telegram user id владельца (тот, кто прошёл онбординг в control-боте)
+  tgUserId: varchar("tgUserId", { length: 64 }).notNull().unique(),
+  businessName: varchar("businessName", { length: 255 }),
+  status: mysqlEnum("status", [
+    "onboarding", // собираем данные, контейнер ещё не поднят
+    "trialing", // активный пробный период
+    "active", // оплаченная подписка
+    "suspended", // приостановлен (неоплата / вручную)
+    "cancelled", // отменён, контейнер удалён
+  ])
+    .default("onboarding")
+    .notNull(),
+  plan: varchar("plan", { length: 50 }).default("trial").notNull(),
+  trialEndsAt: timestamp("trialEndsAt"),
+  // Ключ OpenRouter клиента — за токены платит клиент. Хранится зашифрованным.
+  openrouterKeyEnc: text("openrouterKeyEnc"),
+  model: varchar("model", { length: 120 })
+    .default("deepseek/deepseek-chat")
+    .notNull(),
+  // Произвольный JSON с доступами к источникам данных (например, iiko), зашифрован.
+  integrationsEnc: text("integrationsEnc"),
+  botPoolId: int("botPoolId"),
+  // Имя/идентификатор Docker-контейнера, обслуживающего этого клиента.
+  containerName: varchar("containerName", { length: 255 }),
+  containerStatus: mysqlEnum("containerStatus", [
+    "none",
+    "provisioning",
+    "running",
+    "stopped",
+    "error",
+  ])
+    .default("none")
+    .notNull(),
+  lastError: text("lastError"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type Tenant = typeof tenants.$inferSelect;
+export type InsertTenant = typeof tenants.$inferInsert;
