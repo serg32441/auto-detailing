@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { mkdir } from "node:fs/promises";
-import path from "node:path";
+import { join } from "node:path";
 import type { Tenant } from "@db/schema";
 import { env } from "../lib/env";
 import { buildTenantEnv, containerNameFor } from "./hermes-config";
@@ -44,7 +44,7 @@ export async function provisionTenant(
   try {
     await destroyContainer(containerName);
 
-    const dataDir = path.join(env.tenantsDataDir, String(tenant.id));
+    const dataDir = join(env.tenantsDataDir, String(tenant.id));
     if (!env.provisioningDryRun) {
       await mkdir(dataDir, { recursive: true });
     }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { Menu, X, ShieldCheck, LogOut, User } from "lucide-react";
+import { Menu, X, ShieldCheck, LogOut, User, Bot } from "lucide-react";
 
 export default function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -118,6 +118,29 @@ export default function Navbar() {
           >
             <ShieldCheck size={14} />
             Админ
+          </Link>
+        )}
+
+        {isAdmin && (
+          <Link
+            to="/hermes"
+            style={{
+              color: "#FFFFFF",
+              fontFamily: "Manrope",
+              fontSize: "14px",
+              fontWeight: 300,
+              opacity: 0.8,
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              transition: "opacity 0.2s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
+          >
+            <Bot size={14} />
+            Hermes
           </Link>
         )}
 
