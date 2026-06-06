@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="900" viewBox="0 0 400 900" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <!-- ПРЕВЬЮ (макет), не реальный скриншот развёрнутого бота -->
+  <defs>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- chat background -->
+  <rect width="400" height="900" fill="#cdd6df"/>
+
+  <!-- header -->
+  <rect x="0" y="0" width="400" height="56" fill="#5288c1"/>
+  <circle cx="42" cy="28" r="18" fill="#ffffff"/>
+  <text x="42" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#5288c1">H</text>
+  <text x="72" y="25" font-size="15" font-weight="600" fill="#ffffff">Hermes Agent</text>
+  <text x="72" y="42" font-size="12" fill="#dce8f5">@hermes_agent_bot · bot</text>
+
+  <!-- user: /start -->
+  <g filter="url(#sh)">
+    <rect x="306" y="70" width="82" height="30" rx="10" fill="#e4f6cd"/>
+  </g>
+  <text x="320" y="89" font-size="13.5" fill="#0a0a0a">/start</text>
+  <text x="372" y="93" font-size="10" fill="#7faa5a" text-anchor="end">9:41</text>
+
+  <!-- bot: welcome -->
+  <g filter="url(#sh)">
+    <rect x="12" y="110" width="344" height="300" rx="12" fill="#ffffff"/>
+  </g>
+  <text x="26" y="134" font-size="13.5" fill="#0a0a0a">
+    <tspan x="26" dy="0">👋 Привет! Я помогу за пару минут</tspan>
+    <tspan x="26" dy="19">поднять персонального AI-агента</tspan>
+    <tspan x="26" dy="19">Hermes в Telegram — он собирает</tspan>
+    <tspan x="26" dy="19">данные, делает отчёты и выполняет</tspan>
+    <tspan x="26" dy="19">рутину по расписанию.</tspan>
+    <tspan x="26" dy="28">🎁 Пробный период — 7 дней бесплатно.</tspan>
+    <tspan x="26" dy="28">💳 Далее подписка — <tspan font-weight="700">490 ₽ / 30 дней</tspan></tspan>
+    <tspan x="26" dy="19">(привязка карты — списание 100 ₽,</tspan>
+    <tspan x="26" dy="19">автопродление, отмена в любой момент).</tspan>
+    <tspan x="26" dy="19">Условия и цены: /pricing</tspan>
+    <tspan x="26" dy="28">Шаг 1. Пришлите ключ OpenRouter API</tspan>
+    <tspan x="26" dy="19">(формат sk-or-...).</tspan>
+  </text>
+  <text x="344" y="400" font-size="10" fill="#9aa6b2" text-anchor="end">9:41</text>
+
+  <!-- user: /pricing -->
+  <g filter="url(#sh)">
+    <rect x="292" y="424" width="96" height="30" rx="10" fill="#e4f6cd"/>
+  </g>
+  <text x="306" y="443" font-size="13.5" fill="#0a0a0a">/pricing</text>
+  <text x="372" y="447" font-size="10" fill="#7faa5a" text-anchor="end">9:41</text>
+
+  <!-- bot: pricing -->
+  <g filter="url(#sh)">
+    <rect x="12" y="464" width="344" height="404" rx="12" fill="#ffffff"/>
+  </g>
+  <text x="26" y="488" font-size="13.5" fill="#0a0a0a">
+    <tspan x="26" dy="0" font-weight="700">💼 Hermes-агент — что это и сколько стоит</tspan>
+    <tspan x="26" dy="28">Что получаете: персонального AI-агента</tspan>
+    <tspan x="26" dy="19">в Telegram, который собирает данные,</tspan>
+    <tspan x="26" dy="19">делает отчёты и выполняет задачи по</tspan>
+    <tspan x="26" dy="19">расписанию (например, сводка выручки</tspan>
+    <tspan x="26" dy="19">из iiko).</tspan>
+    <tspan x="26" dy="28" font-weight="700">Тариф:</tspan>
+    <tspan x="26" dy="21">• Пробный период — 7 дней бесплатно</tspan>
+    <tspan x="26" dy="21">• Подписка — 490 ₽ за 30 дней, автопродление</tspan>
+    <tspan x="26" dy="21">• Привязка карты — символическое</tspan>
+    <tspan x="26" dy="19">  списание 100 ₽</tspan>
+    <tspan x="26" dy="28">Оплата картой через ЮKassa.</tspan>
+    <tspan x="26" dy="19">Отменить — /cancel в любой момент.</tspan>
+    <tspan x="26" dy="28" font-weight="700">Оформить: /subscribe</tspan>
+  </text>
+  <text x="344" y="858" font-size="10" fill="#9aa6b2" text-anchor="end">9:41</text>
+</svg>
