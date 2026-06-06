@@ -32,4 +32,20 @@ export const env = {
   tenantMemoryLimit: process.env.TENANT_MEMORY_LIMIT ?? "1g",
   // Режим без реального Docker — для локальной разработки control-plane.
   provisioningDryRun: process.env.PROVISIONING_DRY_RUN === "1",
+
+  // ── Биллинг ЮKassa ───────────────────────────────────────────────────
+  yookassaShopId: process.env.YOOKASSA_SHOP_ID ?? "",
+  yookassaSecretKey: process.env.YOOKASSA_SECRET_KEY ?? "",
+  // Публичный базовый URL control-plane (для return_url и вебхука).
+  publicBaseUrl: process.env.PUBLIC_BASE_URL ?? "",
+  // Сумма периодического платежа в копейках и валюта.
+  billingAmount: Number(process.env.BILLING_AMOUNT ?? "49000"), // 490.00 ₽
+  // Символическая сумма первого платежа для привязки карты (копейки).
+  billingBindAmount: Number(process.env.BILLING_BIND_AMOUNT ?? "10000"), // 100.00 ₽
+  billingCurrency: process.env.BILLING_CURRENCY ?? "RUB",
+  billingPeriodDays: Number(process.env.BILLING_PERIOD_DAYS ?? "30"),
+  // Слать фискальный чек (54-ФЗ) в ЮKassa — требует email/телефон клиента.
+  yookassaSendReceipt: process.env.YOOKASSA_SEND_RECEIPT === "1",
+  // Пропустить проверку IP вебхука (для локальной отладки).
+  yookassaSkipIpCheck: process.env.YOOKASSA_SKIP_IP_CHECK === "1",
 };

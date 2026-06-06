@@ -1,16 +1,18 @@
-// Воркер биллинга: находит клиентов с истёкшим пробным периодом и приостанавливает
-// их контейнеры. Запускать по расписанию (cron), например раз в час:
+// Воркер биллинга: (1) приостанавливает клиентов с истёкшим пробным периодом,
+// (2) списывает автоплатежи у подписок, чей срок подошёл. Запускать по cron,
+// например раз в час:
 //
-//   0 * * * * cd /srv/app && npm run worker:trials >> /var/log/hermes-trials.log 2>&1
-//
-// На этом же месте позже подключается проверка статуса оплаты (ЮKassa): активные
-// подписки продлеваются, неоплаченные — suspend, см. docs/SERVICE.md.
+//   0 * * * * cd /srv/app && npm run worker:trials >> /var/log/hermes-billing.log 2>&1
 
 import { expireTrialsAndSuspend } from "../api/provisioning/tenant-service";
+import { chargeDueSubscriptions } from "../api/billing/billing-service";
 
 async function main(): Promise<void> {
   const suspended = await expireTrialsAndSuspend();
   console.log(`[worker:trials] suspended ${suspended} expired trial(s)`);
+
+  const charged = await chargeDueSubscriptions();
+  console.log(`[worker:billing] initiated ${charged} recurring charge(s)`);
 }
 
 main()

@@ -16,6 +16,7 @@ import {
   setOpenrouterKey,
   startTrial,
 } from "../api/provisioning/tenant-service";
+import { startSubscriptionCheckout } from "../api/billing/billing-service";
 import { getDb } from "../api/queries/connection";
 import { tenants } from "@db/schema";
 import { eq } from "drizzle-orm";
@@ -48,6 +49,33 @@ async function handleText(
     await sendMessage(TOKEN, chatId, WELCOME, {
       disable_web_page_preview: true,
     });
+    return;
+  }
+
+  if (trimmed === "/subscribe") {
+    const t = await getTenantByTgUser(tgUserId);
+    if (!t) {
+      await sendMessage(TOKEN, chatId, "Сначала пройди онбординг: /start.");
+      return;
+    }
+    try {
+      const { confirmationUrl } = await startSubscriptionCheckout(t.id);
+      const amount = (env.billingBindAmount / 100).toFixed(0);
+      await sendMessage(
+        TOKEN,
+        chatId,
+        [
+          "💳 Оформление подписки.",
+          `Привязка карты — символическое списание ${amount} ₽, дальше автопродление.`,
+          "",
+          `Оплатить: ${confirmationUrl}`,
+        ].join("\n"),
+        { disable_web_page_preview: true },
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      await sendMessage(TOKEN, chatId, "⚠️ Не удалось создать оплату: " + msg);
+    }
     return;
   }
 

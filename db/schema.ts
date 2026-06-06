@@ -158,3 +158,64 @@ export const tenants = mysqlTable("tenants", {
 
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = typeof tenants.$inferInsert;
+
+// ── Биллинг (ЮKassa) ───────────────────────────────────────────────────
+// Подписка клиента. Привязка карты происходит на первом (символическом) платеже
+// с save_payment_method=true; полученный paymentMethodId используется для
+// последующих автоплатежей без участия клиента.
+export const subscriptions = mysqlTable("subscriptions", {
+  id: serial("id").primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  status: mysqlEnum("status", [
+    "pending", // создан чек-аут, ждём оплату/привязку
+    "active", // карта привязана, подписка оплачена
+    "past_due", // автоплатёж не прошёл
+    "canceled", // отменена
+  ])
+    .default("pending")
+    .notNull(),
+  // ID сохранённого способа оплаты ЮKassa для автоплатежей.
+  paymentMethodId: varchar("paymentMethodId", { length: 191 }),
+  // Сумма в копейках и валюта периодического платежа.
+  amount: int("amount").notNull(),
+  currency: varchar("currency", { length: 8 }).default("RUB").notNull(),
+  // Когда списывать следующий автоплатёж.
+  nextChargeAt: timestamp("nextChargeAt"),
+  lastPaymentId: varchar("lastPaymentId", { length: 191 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+// Журнал платежей (аудит и идемпотентность вебхуков).
+export const payments = mysqlTable("payments", {
+  id: serial("id").primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  subscriptionId: int("subscriptionId"),
+  // ID платежа в ЮKassa (уникален — защита от повторной обработки вебхука).
+  yookassaId: varchar("yookassaId", { length: 191 }).notNull().unique(),
+  kind: mysqlEnum("kind", ["initial", "recurring"]).notNull(),
+  status: mysqlEnum("status", [
+    "pending",
+    "waiting_for_capture",
+    "succeeded",
+    "canceled",
+  ])
+    .default("pending")
+    .notNull(),
+  amount: int("amount").notNull(),
+  currency: varchar("currency", { length: 8 }).default("RUB").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;

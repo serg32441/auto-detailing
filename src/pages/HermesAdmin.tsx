@@ -12,6 +12,7 @@ import {
   Trash2,
   RefreshCw,
   AlertTriangle,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -118,6 +119,16 @@ export default function HermesAdmin() {
     onSuccess: (r) => {
       toast.success(`Приостановлено истёкших триалов: ${r.suspended}`);
       invalidate();
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const startCheckout = trpc.billing.startCheckout.useMutation({
+    onSuccess: (r) => {
+      void navigator.clipboard?.writeText(r.confirmationUrl).catch(() => {});
+      toast.success("Ссылка на оплату создана и скопирована", {
+        description: r.confirmationUrl,
+      });
     },
     onError: (e) => toast.error(e.message),
   });
@@ -293,6 +304,19 @@ export default function HermesAdmin() {
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-1">
+                            {status !== "cancelled" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={startCheckout.isPending}
+                                title="Создать ссылку на оплату"
+                                onClick={() =>
+                                  startCheckout.mutate({ tenantId: t.id })
+                                }
+                              >
+                                <CreditCard className="size-3.5" />
+                              </Button>
+                            )}
                             {(status === "trialing" || status === "active") && (
                               <Button
                                 size="sm"
