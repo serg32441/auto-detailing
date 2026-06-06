@@ -48,4 +48,6 @@ export const env = {
   yookassaSendReceipt: process.env.YOOKASSA_SEND_RECEIPT === "1",
   // Пропустить проверку IP вебхука (для локальной отладки).
   yookassaSkipIpCheck: process.env.YOOKASSA_SKIP_IP_CHECK === "1",
+  // Контакт поддержки (для условий подписки и модерации ЮKassa).
+  supportContact: process.env.SUPPORT_CONTACT ?? "",
 };

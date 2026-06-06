@@ -5,7 +5,10 @@
 //   0 * * * * cd /srv/app && npm run worker:trials >> /var/log/hermes-billing.log 2>&1
 
 import { expireTrialsAndSuspend } from "../api/provisioning/tenant-service";
-import { chargeDueSubscriptions } from "../api/billing/billing-service";
+import {
+  chargeDueSubscriptions,
+  suspendCanceledExpired,
+} from "../api/billing/billing-service";
 
 async function main(): Promise<void> {
   const suspended = await expireTrialsAndSuspend();
@@ -13,6 +16,9 @@ async function main(): Promise<void> {
 
   const charged = await chargeDueSubscriptions();
   console.log(`[worker:billing] initiated ${charged} recurring charge(s)`);
+
+  const canceled = await suspendCanceledExpired();
+  console.log(`[worker:billing] suspended ${canceled} canceled-expired client(s)`);
 }
 
 main()

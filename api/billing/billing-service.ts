@@ -225,6 +225,48 @@ export async function chargeDueSubscriptions(): Promise<number> {
   return charged;
 }
 
+/**
+ * Отмена подписки клиентом: прекращаем будущие автоплатежи. Доступ сохраняется
+ * до конца уже оплаченного периода (nextChargeAt), после чего воркер приостановит.
+ */
+export async function cancelSubscription(
+  tenantId: number,
+): Promise<{ accessUntil: Date | null }> {
+  const db = getDb();
+  const sub = (
+    await db.select().from(subscriptions).where(eq(subscriptions.tenantId, tenantId)).limit(1)
+  )[0];
+  if (!sub) return { accessUntil: null };
+  await db
+    .update(subscriptions)
+    .set({ status: "canceled" })
+    .where(eq(subscriptions.id, sub.id));
+  return { accessUntil: sub.nextChargeAt };
+}
+
+/**
+ * Приостанавливает клиентов с отменённой подпиской, у которых оплаченный период
+ * уже истёк. Вызывается из cron-воркера.
+ */
+export async function suspendCanceledExpired(): Promise<number> {
+  const db = getDb();
+  const expired = await db
+    .select()
+    .from(subscriptions)
+    .where(
+      and(
+        eq(subscriptions.status, "canceled"),
+        lte(subscriptions.nextChargeAt, new Date()),
+      ),
+    );
+  let count = 0;
+  for (const sub of expired) {
+    await suspendTenant(sub.tenantId);
+    count++;
+  }
+  return count;
+}
+
 // Список IP-диапазонов ЮKassa для вебхуков (best-effort проверка отправителя).
 const YOOKASSA_IPV4 = [
   ["185.71.76.0", 27],

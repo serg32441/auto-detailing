@@ -16,7 +16,10 @@ import {
   setOpenrouterKey,
   startTrial,
 } from "../api/provisioning/tenant-service";
-import { startSubscriptionCheckout } from "../api/billing/billing-service";
+import {
+  startSubscriptionCheckout,
+  cancelSubscription,
+} from "../api/billing/billing-service";
 import { getDb } from "../api/queries/connection";
 import { tenants } from "@db/schema";
 import { eq } from "drizzle-orm";
@@ -26,16 +29,44 @@ if (!TOKEN) {
   throw new Error("CONTROL_BOT_TOKEN is required to run the control bot");
 }
 
+const bindAmount = (env.billingBindAmount / 100).toFixed(0);
+const monthlyAmount = (env.billingAmount / 100).toFixed(0);
+
 const WELCOME = [
   "👋 Привет! Я помогу за пару минут поднять <b>персонального AI-агента Hermes</b>",
   "в Telegram — он умеет собирать данные, делать отчёты и выполнять рутину по расписанию.",
   "",
-  `Пробный период — <b>${env.trialDays} дней бесплатно</b>.`,
+  `🎁 Пробный период — <b>${env.trialDays} дней бесплатно</b>.`,
+  `💳 Далее подписка — <b>${monthlyAmount} ₽ / ${env.billingPeriodDays} дней</b> (привязка карты — символическое списание ${bindAmount} ₽, автопродление, отмена в любой момент).`,
+  "Условия и цены: /pricing",
   "",
   "Шаг 1. Пришли свой ключ <b>OpenRouter API</b> (формат <code>sk-or-...</code>).",
   "Получить ключ: https://openrouter.ai/keys",
   "За токены модели платишь напрямую в OpenRouter — это даёт тебе полный контроль расходов.",
 ].join("\n");
+
+const PRICING = [
+  "💼 <b>Hermes-агент — что это и сколько стоит</b>",
+  "",
+  "<b>Что получаете:</b> персонального AI-агента в Telegram, который собирает",
+  "данные, делает отчёты и выполняет задачи по расписанию (например, ежедневная",
+  "сводка выручки из iiko).",
+  "",
+  "<b>Тариф:</b>",
+  `• Пробный период — ${env.trialDays} дней бесплатно`,
+  `• Подписка — <b>${monthlyAmount} ₽</b> за ${env.billingPeriodDays} дней, автопродление`,
+  `• Привязка карты — первое символическое списание ${bindAmount} ₽`,
+  "",
+  "Оплата банковской картой через <b>ЮKassa</b>. Отменить подписку можно в любой",
+  "момент: команда /cancel" +
+    (env.supportContact ? ` или поддержка: ${env.supportContact}` : "") +
+    ".",
+  env.publicBaseUrl ? `Оферта: ${env.publicBaseUrl}/#/offer` : "",
+  "",
+  "Оформить: /subscribe",
+]
+  .filter(Boolean)
+  .join("\n");
 
 async function handleText(
   tgUserId: string,
@@ -49,6 +80,47 @@ async function handleText(
     await sendMessage(TOKEN, chatId, WELCOME, {
       disable_web_page_preview: true,
     });
+    return;
+  }
+
+  if (trimmed === "/pricing" || trimmed === "/terms") {
+    await sendMessage(TOKEN, chatId, PRICING, {
+      disable_web_page_preview: true,
+    });
+    return;
+  }
+
+  if (trimmed === "/help") {
+    await sendMessage(
+      TOKEN,
+      chatId,
+      [
+        "Команды:",
+        "/start — начать и поднять агента",
+        "/pricing — тариф и условия",
+        "/subscribe — оформить подписку",
+        "/status — статус агента и подписки",
+        "/cancel — отменить подписку",
+      ].join("\n"),
+    );
+    return;
+  }
+
+  if (trimmed === "/cancel") {
+    const t = await getTenantByTgUser(tgUserId);
+    if (!t) {
+      await sendMessage(TOKEN, chatId, "У тебя нет активной подписки.");
+      return;
+    }
+    const { accessUntil } = await cancelSubscription(t.id);
+    await sendMessage(
+      TOKEN,
+      chatId,
+      "Подписка отменена — автосписаний больше не будет." +
+        (accessUntil
+          ? `\nДоступ сохраняется до ${accessUntil.toISOString().slice(0, 10)}.`
+          : ""),
+    );
     return;
   }
 
