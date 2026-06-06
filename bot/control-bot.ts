@@ -32,6 +32,42 @@ if (!TOKEN) {
 const bindAmount = (env.billingBindAmount / 100).toFixed(0);
 const monthlyAmount = (env.billingAmount / 100).toFixed(0);
 
+// Кнопки нижнего меню (reply-keyboard) — витрина, как у магазина.
+const BTN_SUBSCRIBE = "💳 Оформить подписку";
+const BTN_SUPPORT = "🛟 Техподдержка";
+const BTN_ABOUT = "ℹ️ О сервисе";
+
+const MENU = {
+  keyboard: [
+    [{ text: BTN_SUBSCRIBE }],
+    [{ text: BTN_SUPPORT }, { text: BTN_ABOUT }],
+  ],
+  resize_keyboard: true,
+};
+
+// Помощник: шлём сообщение с постоянным меню и без превью ссылок.
+function withMenu(extra?: Record<string, unknown>): Record<string, unknown> {
+  return { disable_web_page_preview: true, reply_markup: MENU, ...extra };
+}
+
+const ABOUT = [
+  "ℹ️ <b>О сервисе Hermes</b>",
+  "",
+  "Мы подключаем персонального AI-агента прямо в твой Telegram: сбор данных,",
+  "отчёты и рутина по расписанию (например, ежедневная сводка выручки из iiko).",
+  "Агент работает на твоём ключе OpenRouter — ты контролируешь расходы на модель.",
+  "",
+  "Тариф и оплата: /pricing",
+  env.publicBaseUrl ? `Публичная оферта: ${env.publicBaseUrl}/#/offer` : "",
+  env.supportContact ? `Поддержка: ${env.supportContact}` : "",
+]
+  .filter(Boolean)
+  .join("\n");
+
+const SUPPORT = env.supportContact
+  ? `🛟 <b>Поддержка</b>\nНапиши нам — поможем с настройкой и оплатой: ${env.supportContact}`
+  : "🛟 <b>Поддержка</b>\nОпиши свой вопрос здесь — мы поможем с настройкой и оплатой.";
+
 const WELCOME = [
   "👋 Привет! Я помогу за пару минут поднять <b>персонального AI-агента Hermes</b>",
   "в Telegram — он умеет собирать данные, делать отчёты и выполнять рутину по расписанию.",
@@ -75,22 +111,34 @@ async function handleText(
 ): Promise<void> {
   const trimmed = text.trim();
 
-  if (trimmed === "/start") {
+  // Нажатия кнопок меню приходят как обычный текст — приводим к командам.
+  let cmd = trimmed;
+  if (trimmed === BTN_SUBSCRIBE) cmd = "/subscribe";
+  else if (trimmed === BTN_SUPPORT) cmd = "/support";
+  else if (trimmed === BTN_ABOUT) cmd = "/about";
+
+  if (cmd === "/start") {
     await getOrCreateTenant(tgUserId);
-    await sendMessage(TOKEN, chatId, WELCOME, {
-      disable_web_page_preview: true,
-    });
+    await sendMessage(TOKEN, chatId, WELCOME, withMenu());
     return;
   }
 
-  if (trimmed === "/pricing" || trimmed === "/terms") {
-    await sendMessage(TOKEN, chatId, PRICING, {
-      disable_web_page_preview: true,
-    });
+  if (cmd === "/pricing" || cmd === "/terms") {
+    await sendMessage(TOKEN, chatId, PRICING, withMenu());
     return;
   }
 
-  if (trimmed === "/help") {
+  if (cmd === "/about") {
+    await sendMessage(TOKEN, chatId, ABOUT, withMenu());
+    return;
+  }
+
+  if (cmd === "/support") {
+    await sendMessage(TOKEN, chatId, SUPPORT, withMenu());
+    return;
+  }
+
+  if (cmd === "/help") {
     await sendMessage(
       TOKEN,
       chatId,
@@ -102,11 +150,12 @@ async function handleText(
         "/status — статус агента и подписки",
         "/cancel — отменить подписку",
       ].join("\n"),
+      withMenu(),
     );
     return;
   }
 
-  if (trimmed === "/cancel") {
+  if (cmd === "/cancel") {
     const t = await getTenantByTgUser(tgUserId);
     if (!t) {
       await sendMessage(TOKEN, chatId, "У тебя нет активной подписки.");
@@ -120,11 +169,12 @@ async function handleText(
         (accessUntil
           ? `\nДоступ сохраняется до ${accessUntil.toISOString().slice(0, 10)}.`
           : ""),
+      withMenu(),
     );
     return;
   }
 
-  if (trimmed === "/subscribe") {
+  if (cmd === "/subscribe") {
     const t = await getTenantByTgUser(tgUserId);
     if (!t) {
       await sendMessage(TOKEN, chatId, "Сначала пройди онбординг: /start.");
@@ -142,16 +192,21 @@ async function handleText(
           "",
           `Оплатить: ${confirmationUrl}`,
         ].join("\n"),
-        { disable_web_page_preview: true },
+        withMenu(),
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      await sendMessage(TOKEN, chatId, "⚠️ Не удалось создать оплату: " + msg);
+      await sendMessage(
+        TOKEN,
+        chatId,
+        "⚠️ Не удалось создать оплату: " + msg,
+        withMenu(),
+      );
     }
     return;
   }
 
-  if (trimmed === "/status") {
+  if (cmd === "/status") {
     const t = await getTenantByTgUser(tgUserId);
     if (!t) {
       await sendMessage(TOKEN, chatId, "Ты ещё не начал. Напиши /start.");

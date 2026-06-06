@@ -14,6 +14,7 @@ import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
 import Admin from "./pages/Admin";
 import HermesAdmin from "./pages/HermesAdmin";
+import Offer from "./pages/Offer";
 import Navbar from "./components/Navbar";
 
 // === tRPC inline ===
@@ -62,6 +63,7 @@ export default function App() {
         <Route path="/services/:id" element={<ServiceDetail />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/hermes" element={<HermesAdmin />} />
+        <Route path="/offer" element={<Offer />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster position="top-right" />
