@@ -9,7 +9,7 @@ FROM debian:bookworm-slim
 
 # Зависимости установщика Hermes (Node, Python, git, ripgrep, ffmpeg, curl).
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl ca-certificates git python3 python3-venv ripgrep ffmpeg \
+    curl ca-certificates git python3 python3-venv ripgrep ffmpeg xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Непривилегированный пользователь — агент исполняет команды, не даём ему root.
