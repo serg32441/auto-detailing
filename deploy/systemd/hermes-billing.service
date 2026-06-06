@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes billing worker (expire trials + recurring charges)
+After=network.target mysql.service
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/srv/app
+EnvironmentFile=/srv/app/.env
+ExecStart=/usr/bin/env npm run worker:trials

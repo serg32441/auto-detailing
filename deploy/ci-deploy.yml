@@ -1,0 +1,29 @@
+name: Deploy
+
+# Деплой по пушу в main (или вручную). Подключается к серверу по SSH и запускает
+# deploy/deploy.sh. Все доступы — в GitHub Secrets, не в репозитории:
+#   SSH_HOST, SSH_USER, SSH_KEY (приватный ключ), SSH_PORT (опц.), DEPLOY_PATH
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            cd "${{ secrets.DEPLOY_PATH }}"
+            ./deploy/deploy.sh

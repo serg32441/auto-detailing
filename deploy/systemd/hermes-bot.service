@@ -1,0 +1,16 @@
+[Unit]
+Description=Hermes onboarding control bot (Telegram long polling)
+After=network.target mysql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/srv/app
+EnvironmentFile=/srv/app/.env
+ExecStart=/usr/bin/env npm run bot:control
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
