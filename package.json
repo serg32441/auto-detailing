@@ -16,7 +16,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "bot:control": "tsx bot/control-bot.ts",
-    "worker:trials": "tsx bot/billing-worker.ts"
+    "worker:trials": "tsx bot/billing-worker.ts",
+    "pool:add": "tsx scripts/pool-add-bot.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.965.0",
