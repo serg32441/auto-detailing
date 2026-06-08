@@ -26,6 +26,9 @@ export const env = {
   controlBotToken: process.env.CONTROL_BOT_TOKEN ?? "",
   // Docker-образ per-tenant Hermes (см. hermes-tenant/Dockerfile).
   hermesImage: process.env.HERMES_IMAGE ?? "hermes-tenant:latest",
+  // Общий ключ OpenRouter владельца сервиса: используется для агентов клиентов,
+  // когда у клиента нет собственного ключа (модель «ключ и оплата на нас»).
+  openrouterKey: process.env.OPENROUTER_API_KEY ?? "",
   // Каталог на хосте для персистентных данных контейнеров (SQLite, память).
   tenantsDataDir: process.env.TENANTS_DATA_DIR ?? "/srv/hermes-tenants",
   // Длительность пробного периода в днях.

@@ -123,7 +123,7 @@ export async function startTrial(
   const db = getDb();
   const tenant = await getTenantById(tenantId);
   if (!tenant) throw new Error("tenant not found");
-  if (!tenant.openrouterKeyEnc) {
+  if (!tenant.openrouterKeyEnc && !env.openrouterKey) {
     throw new Error("OpenRouter key is required before starting the agent");
   }
 

@@ -13,7 +13,6 @@ import { getUpdates, sendMessage } from "../api/provisioning/telegram";
 import {
   getOrCreateTenant,
   getTenantByTgUser,
-  setOpenrouterKey,
   startTrial,
 } from "../api/provisioning/tenant-service";
 import {
@@ -55,7 +54,7 @@ const ABOUT = [
   "",
   "Мы подключаем персонального AI-агента прямо в твой Telegram: сбор данных,",
   "отчёты и рутина по расписанию (например, ежедневная сводка выручки из iiko).",
-  "Агент работает на твоём ключе OpenRouter — ты контролируешь расходы на модель.",
+  "Всё включено: модель и инфраструктура — на нашей стороне, ничего настраивать не нужно.",
   "",
   "Тариф и оплата: /pricing",
   env.publicBaseUrl ? `Публичная оферта: ${env.publicBaseUrl}/#/offer` : "",
@@ -69,16 +68,15 @@ const SUPPORT = env.supportContact
   : "🛟 <b>Поддержка</b>\nОпиши свой вопрос здесь — мы поможем с настройкой и оплатой.";
 
 const WELCOME = [
-  "👋 Привет! Я помогу за пару минут поднять <b>персонального AI-агента Hermes</b>",
-  "в Telegram — он умеет собирать данные, делать отчёты и выполнять рутину по расписанию.",
+  "👋 Привет! Я за минуту подниму тебе <b>персонального AI-агента Hermes</b>",
+  "в Telegram — он собирает данные, делает отчёты и выполняет рутину по расписанию",
+  "(например, ежедневная сводка выручки из iiko).",
   "",
   `🎁 Пробный период — <b>${env.trialDays} дней бесплатно</b>.`,
-  `💳 Далее подписка — <b>${monthlyAmount} ₽ / ${env.billingPeriodDays} дней</b> (привязка карты — символическое списание ${bindAmount} ₽, автопродление, отмена в любой момент).`,
-  "Условия и цены: /pricing",
+  `💳 Далее подписка — <b>${monthlyAmount} ₽ / ${env.billingPeriodDays} дней</b> (привязка карты, автопродление, отмена в любой момент). Условия: /pricing`,
   "",
-  "Шаг 1. Пришли свой ключ <b>OpenRouter API</b> (формат <code>sk-or-...</code>).",
-  "Получить ключ: https://openrouter.ai/keys",
-  "За токены модели платишь напрямую в OpenRouter — это даёт тебе полный контроль расходов.",
+  "Напиши <b>название своего бизнеса или проекта</b> — и я сразу подниму агента.",
+  "Например: <i>Пекарня на Ленина</i>.",
 ].join("\n");
 
 const PRICING = [
@@ -225,27 +223,8 @@ async function handleText(
 
   const tenant = await getOrCreateTenant(tgUserId);
 
-  // Шаг 1: ждём ключ OpenRouter.
-  if (!tenant.openrouterKeyEnc) {
-    if (!trimmed.startsWith("sk-or-")) {
-      await sendMessage(
-        TOKEN,
-        chatId,
-        "Это не похоже на ключ OpenRouter. Он начинается с <code>sk-or-</code>. Пришли его, пожалуйста.",
-      );
-      return;
-    }
-    await setOpenrouterKey(tenant.id, trimmed);
-    await sendMessage(
-      TOKEN,
-      chatId,
-      "✅ Ключ сохранён (зашифрован).\n\nШаг 2. Как называется твой бизнес/проект? " +
-        "Это имя я дам агенту. Например: <i>Пекарня на Ленина</i>.",
-    );
-    return;
-  }
-
-  // Шаг 2: ждём название бизнеса, затем запускаем триал.
+  // Единственный шаг: ждём название бизнеса, затем запускаем триал.
+  // Ключ OpenRouter общий (наш), клиент его не вводит.
   if (tenant.status === "onboarding") {
     const db = getDb();
     await db
