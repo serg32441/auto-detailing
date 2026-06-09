@@ -18,9 +18,12 @@ USER hermes
 WORKDIR /home/hermes
 
 # Установка Hermes Agent (официальный one-liner).
+# --skip-browser: не ставить Playwright/Chromium (для Telegram-агента не нужен,
+#   экономит ~300+ МБ). --skip-setup: без интерактивного мастера (конфиг агента
+#   задаётся при запуске контейнера в entrypoint.sh).
 # Закрепи конкретную версию в проде вместо main для воспроизводимости.
-RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash \
-    || curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --skip-browser --skip-setup \
+    || curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-browser --skip-setup
 
 ENV PATH="/home/hermes/.local/bin:/home/hermes/.hermes/bin:${PATH}"
 ENV HERMES_DATA_DIR="/data"
