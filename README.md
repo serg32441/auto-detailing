@@ -1,3 +1,25 @@
+# Модуль «Сверка планов БТИ» для amoCRM
+
+Этот репозиторий, помимо веб‑приложения, содержит модуль для amoCRM, который
+сравнивает две схемы помещения (план БТИ и вашу схему) и определяет, совпадают
+ли планировки.
+
+**Состав модуля**
+
+| Часть | Где | Назначение |
+| --- | --- | --- |
+| Эндпоинт сравнения | `api/bti/` (`POST /api/bti/compare`) | Гибрид: дешёвый префильтр + ИИ‑сверка через OpenRouter |
+| Веб‑интерфейс | `src/pages/BtiCompare.tsx` (маршрут `/#/bti`) | Загрузка двух картинок и вывод вердикта |
+| Префильтр в браузере | `src/lib/imageHash.ts` | Perceptual hash: идентичные картинки → ответ без ИИ |
+| Виджет amoCRM | `amocrm-widget/` | Пакет для установки в amoCRM (встраивает инструмент) |
+
+Подробная инструкция по установке и настройке — в
+[`amocrm-widget/README.md`](amocrm-widget/README.md). Переменные окружения
+(`OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `BTI_API_TOKEN`, `BTI_PUBLIC_URL`) —
+в `.env.example`.
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

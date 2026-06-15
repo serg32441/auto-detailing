@@ -1,0 +1,33 @@
+{
+  "widget": {
+    "name": "widget.name",
+    "description": "widget.description",
+    "short_description": "widget.short_description",
+    "category": "other",
+    "image": "logo.png",
+    "version": "1.0.0",
+    "interface_version": 2,
+    "init_once": false,
+    "locale": ["ru", "en"],
+    "installation": true,
+    "support": {
+      "link": "",
+      "email": ""
+    }
+  },
+  "locale": ["ru", "en"],
+  "settings": {
+    "app_url": {
+      "name": "widget.settings.app_url",
+      "type": "text",
+      "required": true
+    },
+    "token": {
+      "name": "widget.settings.token",
+      "type": "text",
+      "required": false
+    }
+  },
+  "locations": ["settings", "lcard-1", "ccard-1", "ccard-2"],
+  "advanced": {}
+}

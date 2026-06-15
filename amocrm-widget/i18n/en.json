@@ -1,0 +1,13 @@
+{
+  "widget": {
+    "name": "BTI Plan Comparison",
+    "description": "Upload two floor-plan images (the official BTI plan and your scheme) — the module compares the layouts automatically and reports whether they match, listing any differences.",
+    "short_description": "Automatic comparison of two BTI floor plans",
+    "settings": {
+      "app_url": "Application URL (e.g. https://your-app.vercel.app)",
+      "token": "Access token (if enabled on the server)"
+    },
+    "open_button": "Open BTI plan comparison",
+    "open_hint": "Opens the upload-and-compare window for two plans"
+  }
+}

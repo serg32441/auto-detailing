@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route, useLocation } from "react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { createTRPCReact } from "@trpc/react-query";
 import { httpBatchLink } from "@trpc/client";
@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Services from "./pages/Services";
 import ServiceDetail from "./pages/ServiceDetail";
 import Admin from "./pages/Admin";
+import BtiCompare from "./pages/BtiCompare";
 import Navbar from "./components/Navbar";
 
 // === tRPC inline ===
@@ -50,19 +51,31 @@ function TRPCProvider({ children }: { children: ReactNode }) {
 }
 // === end tRPC ===
 
-export default function App() {
+function AppShell() {
+  // The /bti module is meant to be embedded inside amoCRM, so hide the
+  // marketing navbar there.
+  const isEmbedded = useLocation().pathname.startsWith("/bti");
   return (
-    <TRPCProvider>
-      <Navbar />
+    <>
+      {!isEmbedded && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/services" element={<Services />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/bti" element={<BtiCompare />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster position="top-right" />
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <TRPCProvider>
+      <AppShell />
     </TRPCProvider>
   );
 }
