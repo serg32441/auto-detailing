@@ -26,7 +26,9 @@ app.all("/api/*", (c) => c.json({ error: "Not Found" }, 404));
 
 export default app;
 
-if (env.isProduction) {
+// Self-hosted only: start a long-running HTTP server with `npm start`.
+// On Vercel the request is handled by api/index.ts, so skip the listener there.
+if (env.isProduction && !process.env.VERCEL) {
   const { serve } = await import("@hono/node-server");
   const { serveStaticFiles } = await import("./lib/vite");
   serveStaticFiles(app);
